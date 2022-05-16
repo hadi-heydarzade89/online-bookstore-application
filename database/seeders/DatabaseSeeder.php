@@ -2,6 +2,10 @@
 
 namespace Database\Seeders;
 
+use App\User;
+use App\Author;
+use App\Book;
+use App\BookReview;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -13,20 +17,20 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        $users = factory(App\User::class, 5)->create();
-        $admin = factory(App\User::class, 1)->state('admin')->create();
+        $users = factory(User::class, 5)->create();
+        $admin = factory(User::class, 1)->state('admin')->create();
 
-        factory(App\Author::class, 15)->create()->each(function (App\Author $author) {
-            factory(App\Book::class, 3)->create()->each(function (App\Book $book) use ($author) {
+        factory(Author::class, 15)->create()->each(function (Author $author) {
+            factory(Book::class, 3)->create()->each(function (Book $book) use ($author) {
                 $book->authors()->saveMany([
                     $author,
                 ]);
             });
         });
 
-        \App\Book::all()->each(function (App\Book $book) use ($users) {
-            $reviews = factory(App\BookReview::class, 4)->make();
-            $reviews->each(function (\App\BookReview $review) use ($users) {
+        Book::all()->each(function (Book $book) use ($users) {
+            $reviews = factory(BookReview::class, 4)->make();
+            $reviews->each(function (BookReview $review) use ($users) {
                 $review->user()->associate($users->random());
             });
             $book->reviews()->saveMany($reviews);
